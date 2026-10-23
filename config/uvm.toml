@@ -1,0 +1,14 @@
+[project]
+root = ".."
+
+[run]
+sim = "verilator"
+uvm = true
+top = "and_gate_tb_top"
+rtl = ["rtl/and_gate.sv"]
+tb = ["tb/uvm/interfaces/and_gate_if.sv", "tb/uvm/packages/and_gate_pkg.sv", "tb/uvm/top/and_gate_tb_top.sv"]
+include = ["tb/uvm"]
+build_dir = "build/sim/uvm-verilator"
+waveform_file = "waveforms/and_gate_uvm.vcd"
+jobs = 1
+
