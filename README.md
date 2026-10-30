@@ -22,15 +22,14 @@ and TOML manifest forms for simulation, synthesis, and timing.
 | `rtl/and_gate.sv` | AND-gate design under test |
 | `tb/plain/` | Plain SystemVerilog testbench |
 | `tb/uvm/` | UVM interfaces, packages, agents, environment, sequences, tests, and top |
-| `rtl/constraints/abc/` | ABC input-driver and output-load assumptions |
-| `rtl/constraints/sdc/` | Example OpenSTA timing constraints |
+| `constraints/abc/` | ABC input-driver and output-load assumptions |
+| `constraints/sdc/` | Example OpenSTA timing constraints |
 | `config/` | Plain, UVM, synthesis, and timing TOML manifests |
 | `scripts/` | Plain, UVM, synthesis, and timing command wrappers |
 | `build/` | Generated simulations, netlists, reports, and logs by flow |
 
-The source tree follows the same layout produced by `vlsi init`. Timing
-constraints are kept under `rtl/constraints/` alongside the design they
-constrain.
+The source tree follows the same layout produced by `vlsi init`. Constraint
+files are grouped separately from the RTL sources.
 
 ```text
 .
@@ -38,9 +37,9 @@ constrain.
 ├── rtl/
 │   ├── include/
 │   ├── and_gate.sv
-│   └── constraints/
-│       ├── abc/and_gate.abc
-│       └── sdc/and_gate.sdc
+├── constraints/
+│   ├── abc/and_gate.abc
+│   └── sdc/and_gate.sdc
 ├── tb/
 │   ├── plain/and_gate_tb.sv
 │   └── uvm/
@@ -218,7 +217,7 @@ mapped netlist with OpenSTA:
   --top and_gate \
   --rtl rtl/and_gate.sv \
   --liberty "$LIBERTY" \
-  --abc-constraints rtl/constraints/abc/and_gate.abc \
+  --abc-constraints constraints/abc/and_gate.abc \
   --delay-ps 10000 \
   --build-dir build/synth/technology/sky130
 
@@ -227,7 +226,7 @@ mapped netlist with OpenSTA:
   --top and_gate \
   --netlist build/synth/technology/sky130/netlist.v \
   --liberty "$LIBERTY" \
-  --sdc rtl/constraints/sdc/and_gate.sdc \
+  --sdc constraints/sdc/and_gate.sdc \
   --build-dir build/timing/sky130
 ```
 
@@ -241,8 +240,8 @@ The equivalent manifest commands are:
 The [timing manifest](config/timing.toml) stores the Liberty path, ABC
 constraints, netlist path, SDC, and separate output directories. Update its two
 `liberty` values if the library is installed elsewhere. ABC's estimate uses
-the driver and load in `rtl/constraints/abc/and_gate.abc`; OpenSTA uses the
-clock and I/O budgets in `rtl/constraints/sdc/and_gate.sdc`.
+the driver and load in `constraints/abc/and_gate.abc`; OpenSTA uses the clock
+and I/O budgets in `constraints/sdc/and_gate.sdc`.
 
 These SDC values are demonstration assumptions, not characterized interface
 requirements. Replace them with the design's real timing requirements before
