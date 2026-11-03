@@ -1,6 +1,6 @@
 # Optional host example. Update the Liberty path for your local installation.
 [project]
-root = ".."
+root = "../.."
 
 [synth]
 top = "and_gate"
@@ -8,11 +8,11 @@ rtl = ["rtl/and_gate.sv"]
 liberty = "~/opt/pdk/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
 abc_constraints = "constraints/abc/and_gate.abc"
 delay_ps = 10000
-build_dir = "build/synth/technology/sky130"
+build_dir = "build/synth/and_gate/technology/sky130"
 
 [timing]
 top = "and_gate"
-netlist = "build/synth/technology/sky130/netlist.v"
+netlist = "build/synth/and_gate/technology/sky130/netlist.v"
 liberty = "~/opt/pdk/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
 sdc = "constraints/sdc/and_gate.sdc"
-build_dir = "build/timing/sky130"
+build_dir = "build/timing/and_gate/sky130"

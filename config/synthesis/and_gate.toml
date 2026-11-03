@@ -1,7 +1,7 @@
 [project]
-root = ".."
+root = "../.."
 
 [synth]
 top = "and_gate"
 rtl = ["rtl/and_gate.sv"]
-build_dir = "build/synth/generic"
+build_dir = "build/synth/and_gate/generic"

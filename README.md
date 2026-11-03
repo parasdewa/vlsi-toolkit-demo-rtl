@@ -1,13 +1,13 @@
 # VLSI Toolkit Demo RTL
 
 A small AND-gate project for exercising the VLSI Toolkit simulation,
-synthesis, and static timing flows. The same RTL is used by a plain
+synthesis, and static timing flows. The same RTL is used by a directed
 SystemVerilog testbench, a UVM testbench, and synthesis.
 
 ## Workflow at a glance
 
 1. Check that the toolkit tools are available.
-2. Run the plain testbench with Verilator or Icarus Verilog.
+2. Run the directed testbench with Verilator or Icarus Verilog.
 3. Optionally run the UVM testbench with Verilator.
 4. Inspect the generated waveforms with GTKWave.
 5. Run generic synthesis, or map the design to Sky130 and run OpenSTA timing.
@@ -15,17 +15,42 @@ SystemVerilog testbench, a UVM testbench, and synthesis.
 Run commands from this demo project's root. Examples show direct CLI options
 and TOML manifest forms for simulation, synthesis, and timing.
 
+For shorter project commands, use the root Makefile:
+
+```bash
+make help
+make doctor
+make setup
+make setup-check
+make sim
+make sim SIM=iverilog
+make uvm
+make synth
+make synth-mapped
+make timing
+make wave
+make wave-uvm
+make clean-dry-run
+```
+
+Pass `DESIGN=name` to select another design's manifests when you add one.
+`CONFIG=path/to/manifest.toml` and `WAVEFORM=path/to/file.vcd` override the
+selected manifest and waveform path when needed.
+Mapped synthesis and timing require a compatible Liberty file and constraints
+configured in that design's timing manifest.
+Run `make synth-mapped` before `make timing`.
+
 ## Project contents
 
 | Path | Purpose |
 | --- | --- |
 | `rtl/and_gate.sv` | AND-gate design under test |
-| `tb/plain/` | Plain SystemVerilog testbench |
+| `tb/directed/` | Directed SystemVerilog testbench |
 | `tb/uvm/` | UVM interfaces, packages, agents, environment, sequences, tests, and top |
 | `constraints/abc/` | ABC input-driver and output-load assumptions |
 | `constraints/sdc/` | Example OpenSTA timing constraints |
-| `config/` | Plain, UVM, synthesis, and timing TOML manifests |
-| `scripts/` | Plain, UVM, synthesis, and timing command wrappers |
+| `config/` | Directed, UVM, synthesis, and timing TOML manifests |
+| `scripts/` | Directed, UVM, synthesis, and timing command wrappers |
 | `build/` | Generated simulations, netlists, reports, and logs by flow |
 
 The source tree follows the same layout produced by `vlsi init`. Constraint
@@ -33,7 +58,12 @@ files are grouped separately from the RTL sources.
 
 ```text
 .
-├── config/                     # plain.toml, uvm.toml, synth.toml, timing.toml
+├── config/
+│   ├── simulation/
+│   │   ├── directed/and_gate.toml
+│   │   └── uvm/and_gate.toml
+│   ├── synthesis/and_gate.toml
+│   └── timing/and_gate.toml
 ├── rtl/
 │   ├── include/
 │   ├── and_gate.sv
@@ -41,7 +71,7 @@ files are grouped separately from the RTL sources.
 │   ├── abc/and_gate.abc
 │   └── sdc/and_gate.sdc
 ├── tb/
-│   ├── plain/and_gate_tb.sv
+│   ├── directed/and_gate_tb.sv
 │   └── uvm/
 │       ├── interfaces/
 │       ├── packages/
@@ -50,7 +80,13 @@ files are grouped separately from the RTL sources.
 │       ├── sequences/
 │       ├── tests/
 │       └── top/
-├── scripts/                    # flow wrappers
+├── scripts/
+│   ├── _common.sh
+│   ├── simulation/
+│   │   ├── directed/run_directed.sh
+│   │   └── uvm/run_uvm.sh
+│   ├── synthesis/synth.sh
+│   └── timing/timing.sh
 ├── tests/                      # unit and regression tests
 └── build/                      # generated flow outputs (Git ignored)
 ```
@@ -58,15 +94,31 @@ files are grouped separately from the RTL sources.
 The wrappers can be used after changing to the project root:
 
 ```bash
-./scripts/run_plain.sh
-./scripts/run_plain.sh --sim iverilog
-./scripts/run_uvm.sh
-./scripts/synth.sh
-./scripts/timing.sh
+./scripts/simulation/directed/run_directed.sh
+./scripts/simulation/directed/run_directed.sh --sim iverilog
+./scripts/simulation/uvm/run_uvm.sh
+./scripts/synthesis/synth.sh
+./scripts/timing/timing.sh
 ```
 
-Each wrapper reads its matching manifest from `config/`. The direct CLI
-examples below remain useful when you want to pass settings explicitly.
+These commands use the `and_gate` manifests by default. To select another
+design later, pass its TOML path as the first argument (or use
+`--config MANIFEST.toml`):
+
+```bash
+./scripts/simulation/directed/run_directed.sh config/simulation/directed/my_design.toml
+./scripts/simulation/uvm/run_uvm.sh config/simulation/uvm/my_design.toml
+./scripts/synthesis/synth.sh config/synthesis/my_design.toml
+./scripts/timing/timing.sh config/timing/my_design.toml
+```
+
+Give each design's simulation manifest a unique `build_dir` so its compile
+log, run log, and requested waveform are kept separate.
+
+Each wrapper defaults to this project's `and_gate` manifest. It also accepts a
+different manifest path as its first argument (or `--config MANIFEST.toml`),
+so additional designs can use the same flow scripts. The direct CLI examples
+below remain useful when you want to pass settings explicitly.
 
 ## 1. Check the tools
 
@@ -87,7 +139,7 @@ missing Ubuntu packages and build the supported Verilator and OpenSTA versions:
 See the toolkit's [installation guide](../vlsi-toolkit/docs/INSTALLATION.md)
 for setup modes and requirements.
 
-## 2. Run the plain simulation
+## 2. Run the directed simulation
 
 Run the self-checking testbench directly with Verilator:
 
@@ -96,7 +148,7 @@ Run the self-checking testbench directly with Verilator:
   --project . \
   --top and_gate_tb \
   --rtl rtl/and_gate.sv \
-  --tb tb/plain/and_gate_tb.sv \
+  --tb tb/directed/and_gate_tb.sv \
   --waveform \
   --build-dir build/sim/plain-verilator
 ```
@@ -108,21 +160,22 @@ Run the same testbench directly with Icarus Verilog:
   --project . \
   --top and_gate_tb \
   --rtl rtl/and_gate.sv \
-  --tb tb/plain/and_gate_tb.sv \
+  --tb tb/directed/and_gate_tb.sv \
   --waveform \
   --build-dir build/sim/plain-iverilog
 ```
 
-The equivalent manifest-based run uses `config/plain.toml`, which selects Verilator:
+The equivalent manifest-based run uses
+`config/simulation/directed/and_gate.toml`, which selects Verilator:
 
 ```bash
-../vlsi-toolkit/vlsi run --config config/plain.toml
+../vlsi-toolkit/vlsi run --config config/simulation/directed/and_gate.toml
 ```
 
 Override the manifest's simulator to use Icarus:
 
 ```bash
-../vlsi-toolkit/vlsi run --config config/plain.toml --sim iverilog
+../vlsi-toolkit/vlsi run --config config/simulation/directed/and_gate.toml --sim iverilog
 ```
 
 ## 3. Run the UVM simulation
@@ -152,7 +205,7 @@ Run UVM directly by listing its interface, package, and testbench top:
 Or load the UVM settings from the manifest:
 
 ```bash
-../vlsi-toolkit/vlsi run --config config/uvm.toml
+../vlsi-toolkit/vlsi run --config config/simulation/uvm/and_gate.toml
 ```
 
 The manifest limits Verilator to one build job. A first UVM build may take
@@ -160,13 +213,13 @@ several minutes. The scoreboard checks all four AND-gate input combinations.
 
 ## 4. Open the waveforms
 
-The manifests write simulation outputs under `build/sim/plain-verilator/` and
-`build/sim/uvm-verilator/`.
+The manifests write simulation outputs under `build/sim/and_gate-verilator/`
+and `build/sim/and_gate-uvm-verilator/`.
 Open their VCD files with GTKWave:
 
 ```bash
-gtkwave build/sim/plain-verilator/waveforms/and_gate.vcd
-gtkwave build/sim/uvm-verilator/waveforms/and_gate_uvm.vcd
+gtkwave build/sim/and_gate-verilator/waveforms/and_gate.vcd
+gtkwave build/sim/and_gate-uvm-verilator/waveforms/and_gate_uvm.vcd
 ```
 
 Direct runs write outputs to the `--build-dir` selected in their command. Use
@@ -185,10 +238,10 @@ Run it directly:
   --build-dir build/synth/generic
 ```
 
-Or use the synthesis settings in `config/synth.toml`:
+Or use the synthesis settings in `config/synthesis/and_gate.toml`:
 
 ```bash
-../vlsi-toolkit/vlsi synth --config config/synth.toml
+../vlsi-toolkit/vlsi synth --config config/synthesis/and_gate.toml
 ```
 
 Generic synthesis checks the flow and writes netlists and reports. It does not
@@ -233,11 +286,11 @@ mapped netlist with OpenSTA:
 The equivalent manifest commands are:
 
 ```bash
-../vlsi-toolkit/vlsi synth --config config/timing.toml
-../vlsi-toolkit/vlsi timing --config config/timing.toml
+../vlsi-toolkit/vlsi synth --config config/timing/and_gate.toml
+../vlsi-toolkit/vlsi timing --config config/timing/and_gate.toml
 ```
 
-The [timing manifest](config/timing.toml) stores the Liberty path, ABC
+The [timing manifest](config/timing/and_gate.toml) stores the Liberty path, ABC
 constraints, netlist path, SDC, and separate output directories. Update its two
 `liberty` values if the library is installed elsewhere. ABC's estimate uses
 the driver and load in `constraints/abc/and_gate.abc`; OpenSTA uses the clock
