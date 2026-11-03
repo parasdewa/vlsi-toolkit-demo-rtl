@@ -1,0 +1,18 @@
+# Update the Liberty path if Sky130 is installed in a different location.
+[project]
+root = "../.."
+
+[synth]
+top = "counter_4bit"
+rtl = ["rtl/counter_4bit.sv"]
+liberty = "~/opt/pdk/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
+abc_constraints = "constraints/abc/counter_4bit.abc"
+delay_ps = 10000
+build_dir = "build/synth/counter_4bit/technology/sky130"
+
+[timing]
+top = "counter_4bit"
+netlist = "build/synth/counter_4bit/technology/sky130/netlist.v"
+liberty = "~/opt/pdk/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
+sdc = "constraints/sdc/counter_4bit.sdc"
+build_dir = "build/timing/counter_4bit/sky130"

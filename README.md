@@ -1,8 +1,8 @@
 # VLSI Toolkit Demo RTL
 
-A small AND-gate project for exercising the VLSI Toolkit simulation,
-synthesis, and static timing flows. The same RTL is used by a directed
-SystemVerilog testbench, a UVM testbench, and synthesis.
+A small project for exercising the VLSI Toolkit flows with an AND gate, a
+4-to-1 mux, and a 4-bit counter. The AND gate has directed and UVM testbenches;
+the mux and counter currently have directed testbenches.
 
 ## Workflow at a glance
 
@@ -24,28 +24,41 @@ make setup
 make setup-check
 make sim
 make sim SIM=iverilog
+make sim DESIGN=mux_2x4
+make sim DESIGN=counter_4bit SIM=iverilog
 make uvm
 make synth
+make synth DESIGN=mux_2x4
 make synth-mapped
+make synth-mapped DESIGN=counter_4bit
 make timing
+make timing DESIGN=mux_2x4
 make wave
+make wave DESIGN=counter_4bit
 make wave-uvm
 make clean-dry-run
 ```
 
-Pass `DESIGN=name` to select another design's manifests when you add one.
+Pass `DESIGN=name` to select the matching design manifests.
 `CONFIG=path/to/manifest.toml` and `WAVEFORM=path/to/file.vcd` override the
 selected manifest and waveform path when needed.
 Mapped synthesis and timing require a compatible Liberty file and constraints
 configured in that design's timing manifest.
 Run `make synth-mapped` before `make timing`.
+The available UVM testbench is for `and_gate`; mux and counter have no UVM
+testbench or UVM manifest yet. Their directed testbenches write
+`tb_mux_2x4.vcd` and `tb_counter_4bit.vcd` at the project root, which is where
+`make wave DESIGN=mux_2x4` and `make wave DESIGN=counter_4bit` look by default.
 
 ## Project contents
 
 | Path | Purpose |
 | --- | --- |
 | `rtl/and_gate.sv` | AND-gate design under test |
-| `tb/directed/` | Directed SystemVerilog testbench |
+| `rtl/mux_2x4.sv` | 4-to-1 mux design under test |
+| `rtl/counter_4bit.sv` | 4-bit counter design under test |
+| `tb/directed/and_gate_tb.sv` | AND-gate directed testbench |
+| `tb/tb_mux_2x4.sv`, `tb/tb_counter_4bit.sv` | Mux and counter directed testbenches |
 | `tb/uvm/` | UVM interfaces, packages, agents, environment, sequences, tests, and top |
 | `constraints/abc/` | ABC input-driver and output-load assumptions |
 | `constraints/sdc/` | Example OpenSTA timing constraints |
@@ -61,15 +74,19 @@ files are grouped separately from the RTL sources.
 ├── config/
 │   ├── simulation/
 │   │   ├── directed/and_gate.toml
+│   │   ├── directed/mux_2x4.toml
+│   │   ├── directed/counter_4bit.toml
 │   │   └── uvm/and_gate.toml
-│   ├── synthesis/and_gate.toml
-│   └── timing/and_gate.toml
+│   ├── synthesis/{and_gate,mux_2x4,counter_4bit}.toml
+│   └── timing/{and_gate,mux_2x4,counter_4bit}.toml
 ├── rtl/
 │   ├── include/
 │   ├── and_gate.sv
+│   ├── mux_2x4.sv
+│   └── counter_4bit.sv
 ├── constraints/
-│   ├── abc/and_gate.abc
-│   └── sdc/and_gate.sdc
+│   ├── abc/{and_gate,mux_2x4,counter_4bit}.abc
+│   └── sdc/{and_gate,mux_2x4,counter_4bit}.sdc
 ├── tb/
 │   ├── directed/and_gate_tb.sv
 │   └── uvm/
@@ -101,9 +118,9 @@ The wrappers can be used after changing to the project root:
 ./scripts/timing/timing.sh
 ```
 
-These commands use the `and_gate` manifests by default. To select another
-design later, pass its TOML path as the first argument (or use
-`--config MANIFEST.toml`):
+The wrappers use the `and_gate` manifests by default. Select the mux or counter
+from the Makefile with `DESIGN=name`, or pass a manifest path to a wrapper (or
+use `--config MANIFEST.toml`):
 
 ```bash
 ./scripts/simulation/directed/run_directed.sh config/simulation/directed/my_design.toml
@@ -111,6 +128,10 @@ design later, pass its TOML path as the first argument (or use
 ./scripts/synthesis/synth.sh config/synthesis/my_design.toml
 ./scripts/timing/timing.sh config/timing/my_design.toml
 ```
+
+For example, `make sim DESIGN=mux_2x4`, `make synth DESIGN=counter_4bit`,
+`make synth-mapped DESIGN=mux_2x4`, and `make timing DESIGN=counter_4bit`
+select the corresponding design manifests without spelling out their paths.
 
 Give each design's simulation manifest a unique `build_dir` so its compile
 log, run log, and requested waveform are kept separate.

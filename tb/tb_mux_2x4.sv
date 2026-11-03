@@ -5,11 +5,13 @@ module tb_mux_2x4;
     wire out;
 
     // DUT instantiation
-    mux_2x4 MUX_2x4(.in(in), .s(s), .out(s));
+    mux_2x4 MUX_2x4(.in(in), .s(s), .out(out));
 
     // Initialize the signals
-    inital begin
-        #0; in = 4'b0000, s = 2'b00;
+    initial begin
+        #0;
+        in = 4'b0000;
+        s = 2'b00;
     end
 
     // Stimulus

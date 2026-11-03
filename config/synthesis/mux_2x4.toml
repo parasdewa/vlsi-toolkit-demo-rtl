@@ -1,0 +1,7 @@
+[project]
+root = "../.."
+
+[synth]
+top = "mux_2x4"
+rtl = ["rtl/mux_2x4.sv"]
+build_dir = "build/synth/mux_2x4/generic"

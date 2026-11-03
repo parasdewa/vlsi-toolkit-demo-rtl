@@ -1,0 +1,10 @@
+[project]
+root = "../../.."
+
+[run]
+sim = "verilator"
+top = "tb_mux_2x4"
+rtl = ["rtl/mux_2x4.sv"]
+tb = ["tb/tb_mux_2x4.sv"]
+build_dir = "build/sim/mux_2x4-verilator"
+jobs = 1

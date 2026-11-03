@@ -11,7 +11,7 @@ DIRECTED_CONFIG ?= $(if $(strip $(CONFIG)),$(CONFIG),config/simulation/directed/
 UVM_CONFIG ?= $(if $(strip $(CONFIG)),$(CONFIG),config/simulation/uvm/$(DESIGN).toml)
 SYNTH_CONFIG ?= $(if $(strip $(CONFIG)),$(CONFIG),config/synthesis/$(DESIGN).toml)
 TIMING_CONFIG ?= $(if $(strip $(CONFIG)),$(CONFIG),config/timing/$(DESIGN).toml)
-SIM_WAVEFORM ?= build/sim/$(DESIGN)-$(SIM_NAME)/waveforms/$(DESIGN).vcd
+SIM_WAVEFORM ?= $(if $(filter mux_2x4 counter_4bit,$(DESIGN)),tb_$(DESIGN).vcd,build/sim/$(DESIGN)-$(SIM_NAME)/waveforms/$(DESIGN).vcd)
 UVM_WAVEFORM ?= build/sim/$(DESIGN)-uvm-verilator/waveforms/$(DESIGN)_uvm.vcd
 WAVEFORM ?=
 LIBERTY ?=
@@ -24,12 +24,12 @@ SIM_BUILD_OPTION = $(if $(strip $(SIM)),--build-dir "build/sim/$(DESIGN)-$(SIM)"
 help:
 	@printf '%s\n' \
 	  'VLSI Toolkit Demo RTL targets:' \
-	  '  make sim [DESIGN=and_gate] [SIM=iverilog|verilator]' \
+	  '  make sim [DESIGN=and_gate|mux_2x4|counter_4bit] [SIM=iverilog|verilator]' \
 	  '  make uvm [DESIGN=and_gate] [CONFIG=FILE]' \
-	  '  make synth [DESIGN=and_gate] | make synth-mapped [DESIGN=and_gate]' \
-	  '  make timing [DESIGN=and_gate]' \
+	  '  make synth [DESIGN=and_gate|mux_2x4|counter_4bit] | make synth-mapped [DESIGN=name]' \
+	  '  make timing [DESIGN=and_gate|mux_2x4|counter_4bit]' \
 	  '  Use CONFIG=FILE or WAVEFORM=FILE to override automatic selection' \
-	  '  make wave [DESIGN=and_gate] | make wave-uvm [DESIGN=and_gate]' \
+	  '  make wave [DESIGN=and_gate|mux_2x4|counter_4bit] | make wave-uvm [DESIGN=and_gate]' \
 	  '  make doctor | library-check LIBERTY=path/to/cells.lib' \
 	  '  make setup | setup-check | smoke' \
 	  '  make clean-dry-run | clean'
