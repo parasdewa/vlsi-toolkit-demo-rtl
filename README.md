@@ -298,7 +298,7 @@ mapped netlist with OpenSTA:
 ../vlsi-toolkit/vlsi timing \
   --project . \
   --top and_gate \
-  --netlist build/synth/technology/sky130/netlist.v \
+  --netlist build/synth/technology/sky130/and_gate_netlist.v \
   --liberty "$LIBERTY" \
   --sdc constraints/sdc/and_gate.sdc \
   --build-dir build/timing/sky130

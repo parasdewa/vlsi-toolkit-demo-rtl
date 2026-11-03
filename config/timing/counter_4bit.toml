@@ -12,7 +12,7 @@ build_dir = "build/synth/counter_4bit/technology/sky130"
 
 [timing]
 top = "counter_4bit"
-netlist = "build/synth/counter_4bit/technology/sky130/netlist.v"
+netlist = "build/synth/counter_4bit/technology/sky130/counter_4bit_netlist.v"
 liberty = "~/opt/pdk/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
 sdc = "constraints/sdc/counter_4bit.sdc"
 build_dir = "build/timing/counter_4bit/sky130"

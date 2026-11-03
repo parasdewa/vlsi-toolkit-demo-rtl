@@ -12,7 +12,7 @@ build_dir = "build/synth/mux_2x4/technology/sky130"
 
 [timing]
 top = "mux_2x4"
-netlist = "build/synth/mux_2x4/technology/sky130/netlist.v"
+netlist = "build/synth/mux_2x4/technology/sky130/mux_2x4_netlist.v"
 liberty = "~/opt/pdk/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
 sdc = "constraints/sdc/mux_2x4.sdc"
 build_dir = "build/timing/mux_2x4/sky130"
