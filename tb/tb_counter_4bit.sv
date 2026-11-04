@@ -5,6 +5,7 @@ module tb_counter_4bit();
     reg clk;
     reg reset;
     wire [3:0] count;
+    string waveform_file;
 
     // Instantiate the Unit Under Test (UUT)
     counter_4bit uut (
@@ -45,10 +46,14 @@ module tb_counter_4bit();
                  $time, reset, count, count);
     end
 
-        // Waveform Dumps
+    // Use the waveform path selected by the VLSI toolkit manifest.
+`ifdef VLSI_WAVEFORM
     initial begin
-        $dumpfile("tb_counter_4bit.vcd");
+        if (!$value$plusargs("VLSI_WAVEFORM=%s", waveform_file))
+            waveform_file = "counter_4bit.vcd";
+        $dumpfile(waveform_file);
         $dumpvars(0, tb_counter_4bit);
     end
+`endif
 
 endmodule

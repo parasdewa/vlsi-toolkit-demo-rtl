@@ -7,4 +7,6 @@ top = "tb_counter_4bit"
 rtl = ["rtl/counter_4bit.sv"]
 tb = ["tb/tb_counter_4bit.sv"]
 build_dir = "build/sim/counter_4bit-verilator"
+waveform = true
+waveform_file = "waveforms/counter_4bit.vcd"
 jobs = 1

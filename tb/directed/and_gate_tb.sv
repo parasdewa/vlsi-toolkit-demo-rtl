@@ -9,7 +9,7 @@ module and_gate_tb;
 `ifdef VLSI_WAVEFORM
     initial begin
         if (!$value$plusargs("VLSI_WAVEFORM=%s", waveform_file))
-            waveform_file = "waveform.vcd";
+            waveform_file = "and_gate.vcd";
         $dumpfile(waveform_file);
         $dumpvars(0, and_gate_tb);
     end

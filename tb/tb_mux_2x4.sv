@@ -3,6 +3,7 @@ module tb_mux_2x4;
     reg [3:0]in;
     reg [1:0]s;
     wire out;
+    string waveform_file;
 
     // DUT instantiation
     mux_2x4 MUX_2x4(.in(in), .s(s), .out(out));
@@ -24,10 +25,14 @@ module tb_mux_2x4;
         #10; $finish;
     end
 
-    // Waveform Dumps
+    // Use the waveform path selected by the VLSI toolkit manifest.
+`ifdef VLSI_WAVEFORM
     initial begin
-        $dumpfile("tb_mux_2x4.vcd");
+        if (!$value$plusargs("VLSI_WAVEFORM=%s", waveform_file))
+            waveform_file = "mux_2x4.vcd";
+        $dumpfile(waveform_file);
         $dumpvars(0, tb_mux_2x4);
     end
+`endif
 
 endmodule

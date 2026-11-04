@@ -1,0 +1,21 @@
+[project]
+# Keep for files in config/simulation/directed/.
+root = "../../.."
+
+[run]
+sim = "verilator"
+uvm = false
+# UPDATE: testbench module name.
+top = "tb_ripple_carry_adder_4bit"
+# UPDATE: RTL files in dependency order (full_adder is instantiated by adder_4bit).
+rtl = ["rtl/full_adder.sv", "rtl/adder_4bit.sv"]
+# UPDATE: directed testbench file(s).
+tb = ["tb/directed/tb_4bit_adder.sv"]
+# UPDATE: include directories if needed.
+include = ["rtl/include"]
+waveform = true
+# UPDATE: VCD name; align the design stem with DESIGN=adder_4bit.
+waveform_file = "waveforms/adder_4bit.vcd"
+# UPDATE: unique per-design build directory.
+build_dir = "build/sim/adder_4bit-verilator"
+jobs = 1

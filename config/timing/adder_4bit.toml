@@ -1,0 +1,29 @@
+# Mapped synthesis and timing configuration for the structural 4-bit adder.
+[project]
+# Keep for files in config/timing/.
+root = "../.."
+
+[synth]
+# UPDATE: RTL top and ordered source files; exclude testbench sources.
+top = "ripple_carry_adder_4bit"
+rtl = ["rtl/full_adder.sv", "rtl/adder_4bit.sv"]
+include = ["rtl/include"]
+# UPDATE: compatible target library; use the same Liberty below in [timing].
+liberty = "~/opt/pdk/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
+# UPDATE: ABC driver/load assumptions for this library and design.
+abc_constraints = "constraints/abc/adder_4bit.abc"
+# UPDATE: requested mapping delay in picoseconds.
+delay_ps = 10000
+# UPDATE: technology-mapped output directory.
+build_dir = "build/synth/technology/adder_4bit"
+
+[timing]
+# UPDATE: same RTL top and Liberty as in [synth].
+top = "ripple_carry_adder_4bit"
+# UPDATE: generated <top>_netlist.v in the [synth] output directory.
+netlist = "build/synth/technology/adder_4bit/ripple_carry_adder_4bit_netlist.v"
+liberty = "~/opt/pdk/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
+# UPDATE: SDC with design clock and I/O constraints.
+sdc = "constraints/sdc/adder_4bit.sdc"
+# UPDATE: timing reports output directory.
+build_dir = "build/timing/adder_4bit"

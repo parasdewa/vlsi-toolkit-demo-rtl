@@ -9,6 +9,7 @@ module and_gate_tb_top;
         .b(vif.b),
         .y(vif.y)
     );
+    string waveform_file;
 
     initial begin
         vif.a = 0;
@@ -21,8 +22,12 @@ module and_gate_tb_top;
         run_test("and_gate_test");
     end
 
+`ifdef VLSI_WAVEFORM
     initial begin
-        $dumpfile("waveforms/and_gate_uvm.vcd");
+        if (!$value$plusargs("VLSI_WAVEFORM=%s", waveform_file))
+            waveform_file = "and_gate_uvm.vcd";
+        $dumpfile(waveform_file);
         $dumpvars(0, and_gate_tb_top);
     end
+`endif
 endmodule

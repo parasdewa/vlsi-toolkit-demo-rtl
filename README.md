@@ -1,8 +1,10 @@
 # VLSI Toolkit Demo RTL
 
 A small project for exercising the VLSI Toolkit flows with an AND gate, a
-4-to-1 mux, and a 4-bit counter. The AND gate has directed and UVM testbenches;
-the mux and counter currently have directed testbenches.
+4-to-1 mux, a 4-bit counter, and a structural 4-bit adder. The AND gate has
+directed and UVM testbenches; the mux, counter, and adder currently have
+directed testbenches. The adder's `full_adder` module is instantiated four
+times by `ripple_carry_adder_4bit`.
 
 ## Workflow at a glance
 
@@ -26,15 +28,22 @@ make sim
 make sim SIM=iverilog
 make sim DESIGN=mux_2x4
 make sim DESIGN=counter_4bit SIM=iverilog
+make sim DESIGN=adder_4bit
+make sim DESIGN=adder_4bit SIM=iverilog
 make uvm
 make synth
 make synth DESIGN=mux_2x4
 make synth-mapped
 make synth-mapped DESIGN=counter_4bit
+make synth DESIGN=adder_4bit
+make synth-mapped DESIGN=adder_4bit
 make timing
 make timing DESIGN=mux_2x4
+make timing DESIGN=adder_4bit
 make wave
 make wave DESIGN=counter_4bit
+make wave DESIGN=adder_4bit
+make wave DESIGN=adder_4bit SIM=iverilog
 make wave-uvm
 make clean-dry-run
 ```
@@ -45,10 +54,12 @@ selected manifest and waveform path when needed.
 Mapped synthesis and timing require a compatible Liberty file and constraints
 configured in that design's timing manifest.
 Run `make synth-mapped` before `make timing`.
-The available UVM testbench is for `and_gate`; mux and counter have no UVM
-testbench or UVM manifest yet. Their directed testbenches write
-`tb_mux_2x4.vcd` and `tb_counter_4bit.vcd` at the project root, which is where
-`make wave DESIGN=mux_2x4` and `make wave DESIGN=counter_4bit` look by default.
+The available UVM testbench is for `and_gate`; the mux, counter, and adder have
+no UVM testbench or UVM manifest yet. Each directed manifest writes a design-named
+VCD under that design's build directory, where `make wave DESIGN=mux_2x4` and
+`make wave DESIGN=counter_4bit` look by default. See
+[`initial-start.md`](initial-start.md) for the adder's source layout, TOML
+fields, and commands for simulation, waveform viewing, synthesis, and timing.
 
 ## Project contents
 
@@ -57,8 +68,10 @@ testbench or UVM manifest yet. Their directed testbenches write
 | `rtl/and_gate.sv` | AND-gate design under test |
 | `rtl/mux_2x4.sv` | 4-to-1 mux design under test |
 | `rtl/counter_4bit.sv` | 4-bit counter design under test |
+| `rtl/full_adder.sv`, `rtl/adder_4bit.sv` | Full-adder cell and structural 4-bit adder top |
 | `tb/directed/and_gate_tb.sv` | AND-gate directed testbench |
 | `tb/tb_mux_2x4.sv`, `tb/tb_counter_4bit.sv` | Mux and counter directed testbenches |
+| `tb/directed/tb_4bit_adder.sv` | Structural adder directed testbench |
 | `tb/uvm/` | UVM interfaces, packages, agents, environment, sequences, tests, and top |
 | `constraints/abc/` | ABC input-driver and output-load assumptions |
 | `constraints/sdc/` | Example OpenSTA timing constraints |
@@ -76,19 +89,23 @@ files are grouped separately from the RTL sources.
 │   │   ├── directed/and_gate.toml
 │   │   ├── directed/mux_2x4.toml
 │   │   ├── directed/counter_4bit.toml
+│   │   ├── directed/adder_4bit.toml
 │   │   └── uvm/and_gate.toml
-│   ├── synthesis/{and_gate,mux_2x4,counter_4bit}.toml
-│   └── timing/{and_gate,mux_2x4,counter_4bit}.toml
+│   ├── synthesis/{and_gate,mux_2x4,counter_4bit,adder_4bit}.toml
+│   └── timing/{and_gate,mux_2x4,counter_4bit,adder_4bit}.toml
 ├── rtl/
 │   ├── include/
 │   ├── and_gate.sv
 │   ├── mux_2x4.sv
+│   ├── full_adder.sv
+│   ├── adder_4bit.sv
 │   └── counter_4bit.sv
 ├── constraints/
-│   ├── abc/{and_gate,mux_2x4,counter_4bit}.abc
-│   └── sdc/{and_gate,mux_2x4,counter_4bit}.sdc
+│   ├── abc/{and_gate,mux_2x4,counter_4bit,adder_4bit}.abc
+│   └── sdc/{and_gate,mux_2x4,counter_4bit,adder_4bit}.sdc
 ├── tb/
 │   ├── directed/and_gate_tb.sv
+│   ├── directed/tb_4bit_adder.sv
 │   └── uvm/
 │       ├── interfaces/
 │       ├── packages/

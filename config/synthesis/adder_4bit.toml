@@ -1,0 +1,13 @@
+[project]
+# Keep for manifests in config/synthesis/.
+root = "../.."
+
+[synth]
+# UPDATE: synthesizable RTL top module (not the testbench top).
+top = "ripple_carry_adder_4bit"
+# UPDATE: list RTL files in dependency order; do not list testbench files.
+rtl = ["rtl/full_adder.sv", "rtl/adder_4bit.sv"]
+# UPDATE: add include paths if needed.
+include = ["rtl/include"]
+# UPDATE: unique generic synthesis output directory.
+build_dir = "build/synth/adder_4bit/generic"
